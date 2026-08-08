@@ -5,25 +5,61 @@
   var nav = document.querySelector('.site-nav');
   var navLinks = nav ? nav.querySelectorAll('a') : [];
   var yearEl = document.getElementById('footer-year');
+  var mobileMenuQuery = window.matchMedia('(max-width: 767px)');
+
+  function isMenuOpen() {
+    return menuToggle && menuToggle.getAttribute('aria-expanded') === 'true';
+  }
+
+  function setBodyMenuLock(locked) {
+    if (mobileMenuQuery.matches) {
+      document.body.classList.remove('menu-open');
+      return;
+    }
+
+    document.body.classList.toggle('menu-open', locked);
+  }
+
+  function openMenu() {
+    if (!menuToggle || !nav) return;
+    menuToggle.setAttribute('aria-expanded', 'true');
+    menuToggle.setAttribute('aria-label', 'Cerrar menú de navegación');
+    nav.classList.add('site-nav--open');
+    setBodyMenuLock(true);
+  }
 
   function closeMenu() {
     if (!menuToggle || !nav) return;
     menuToggle.setAttribute('aria-expanded', 'false');
     menuToggle.setAttribute('aria-label', 'Abrir menú de navegación');
     nav.classList.remove('site-nav--open');
-    document.body.classList.remove('menu-open');
+    setBodyMenuLock(false);
+  }
+
+  function toggleMenu() {
+    if (isMenuOpen()) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
   }
 
   if (menuToggle && nav) {
-    menuToggle.addEventListener('click', function () {
-      var isOpen = menuToggle.getAttribute('aria-expanded') === 'true';
-      menuToggle.setAttribute('aria-expanded', String(!isOpen));
-      menuToggle.setAttribute(
-        'aria-label',
-        isOpen ? 'Abrir menú de navegación' : 'Cerrar menú de navegación'
-      );
-      nav.classList.toggle('site-nav--open', !isOpen);
-      document.body.classList.toggle('menu-open', !isOpen);
+    menuToggle.addEventListener('click', function (event) {
+      event.stopPropagation();
+      toggleMenu();
+    });
+
+    document.addEventListener('click', function (event) {
+      if (!isMenuOpen()) return;
+      if (event.target.closest('.nav-toggle') || event.target.closest('.site-nav')) return;
+      closeMenu();
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && isMenuOpen()) {
+        closeMenu();
+      }
     });
 
     navLinks.forEach(function (link) {
