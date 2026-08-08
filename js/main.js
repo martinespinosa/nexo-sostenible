@@ -88,15 +88,6 @@
     });
   }
 
-  var logoLink = document.querySelector('.logo[href="#inicio"]');
-  if (logoLink) {
-    logoLink.addEventListener('click', function (event) {
-      event.preventDefault();
-      closeMenu();
-      scrollToInicio();
-    });
-  }
-
   if (yearEl) {
     yearEl.textContent = new Date().getFullYear();
   }
